@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Baris URL dihapus di sini sesuai standar Prisma 7
 }
 
 model User {
@@ -23,7 +23,7 @@ model Project {
   id        String   @id @default(cuid())
   name      String
   userId    String
-  // Tambahkan onDelete: Cascade di sini
+  // Relation dengan Cascade Delete aktif
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
