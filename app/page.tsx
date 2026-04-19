@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { SignInButton, UserButton, useUser } from "@clerk/nextjs";
-import { ArrowRight, CheckCircle2, Zap, LayoutDashboard, Loader2, Play } from "lucide-react";
+import { ArrowRight, CheckCircle2, Zap, LayoutDashboard, Loader2 } from "lucide-react";
 import Link from "next/link";
 
 export default function Home() {
@@ -10,16 +10,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-zinc-500/30 font-sans">
-      {/* --- NAVBAR (FIXED SPACING) --- */}
+      {/* --- NAVBAR --- */}
       <nav className="flex items-center justify-between px-4 py-4 md:px-12 md:py-6 border-b border-zinc-900 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tighter shrink-0">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             <Zap className="text-black w-5 h-5 fill-current" />
           </div>
-          <span className="text-white font-black tracking-tight">SAAS KIT</span>
+          <span className="text-white font-black tracking-tight">LUMESTACK</span>
         </div>
         
-        {/* GAP DITAMBAH BIAR GAK RAPET DI HP */}
         <div className="flex items-center gap-3 md:gap-6">
           {!isLoaded ? (
             <Loader2 className="w-5 h-5 animate-spin text-zinc-500" />
@@ -69,7 +68,7 @@ export default function Home() {
           Stop wasting time on configuration and start building your product.
         </p>
 
-        {/* --- CTA BUTTONS --- */}
+        {/* --- CTA BUTTONS (CLEANED UP) --- */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center min-h-[60px]">
           {!isLoaded ? (
              <Button disabled size="lg" className="h-14 px-10 bg-zinc-900 text-zinc-600 rounded-full border border-zinc-800">
@@ -85,23 +84,12 @@ export default function Home() {
             </Link>
           ) : (
             <Link href="https://lumestack.gumroad.com/l/saas-kit-2026">
-              <Button size="lg" className="h-14 px-10 bg-white text-black hover:bg-zinc-200 font-bold text-lg rounded-full group transition-all active:scale-95">
+              <Button size="lg" className="h-14 px-10 bg-white text-black hover:bg-zinc-200 font-bold text-lg rounded-full group transition-all active:scale-95 shadow-2xl shadow-white/5">
                 Get Lifetime Access — $39
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
           )}
-
-          <Link href="https://youtube.com" target="_blank">
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="h-14 px-10 border-zinc-800 bg-transparent text-zinc-100 hover:bg-zinc-900 hover:text-white rounded-full font-medium transition-colors"
-            >
-              <Play className="mr-2 w-4 h-4 fill-current" />
-              Watch Demo
-            </Button>
-          </Link>
         </div>
 
         {/* --- FEATURES PREVIEW --- */}
@@ -139,7 +127,7 @@ export default function Home() {
       {/* --- FOOTER --- */}
       <footer className="py-12 border-t border-zinc-900 text-center">
         <p className="text-zinc-600 text-sm">
-          © 2026 SaaS Boilerplate Premium. <br className="md:hidden" />
+          © 2026 LumeStack Premium. <br className="md:hidden" />
           Build by <span className="text-zinc-400 font-medium">S.Kom Dev</span> in Sumedang.
         </p>
       </footer>
