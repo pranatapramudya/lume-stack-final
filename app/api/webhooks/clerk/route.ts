@@ -50,7 +50,6 @@ export async function POST(req: Request) {
   const fName = cleanPart(first_name);
   const lName = cleanPart(last_name);
   const fullName = `${fName} ${lName}`.trim() || "User";
-  
   const email = email_addresses?.[0]?.email_address || "no-email@test.com";
 
   // 1. CREATE & UPDATE (UPSERT)
@@ -58,10 +57,7 @@ export async function POST(req: Request) {
     try {
       await db.user.upsert({
         where: { id: id },
-        update: { 
-          email: email, 
-          name: fullName 
-        },
+        update: { email, name: fullName },
         create: {
           id: id,
           email: email,
@@ -69,7 +65,7 @@ export async function POST(req: Request) {
           isActive: true,
         },
       });
-      console.log(`✅ [${eventType}] Sync Success: ${id} | ${fullName}`);
+      console.log(`✅ [${eventType}] Sync Success: ${id}`);
       return new Response('Sync Success', { status: 200 });
     } catch (dbError) {
       console.error('❌ Database Ops Error:', dbError);
@@ -77,24 +73,30 @@ export async function POST(req: Request) {
     }
   }
 
-  // 2. DELETE (FINAL FIX)
+  // 2. DELETE (ULTIMATE CLEANUP) - SOLUSI MASALAH NYANGKUT
   if (eventType === 'user.deleted') {
     try {
-      // Pastikan id tersedia dari payload Clerk
       if (!id) return new Response('Error: No user id', { status: 400 });
 
-      // Eksekusi hapus di Neon DB
-      // Ini akan otomatis menghapus Project karena onDelete: Cascade
+      console.log(`🗑️ Processing Delete for User: ${id}`);
+
+      // LANGKAH 1: Hapus manual semua project milik user ini dulu
+      // Ini dilakukan untuk memastikan tidak ada constraint error di Neon
+      await db.project.deleteMany({
+        where: { userId: id },
+      });
+
+      // LANGKAH 2: Hapus User-nya
       await db.user.delete({
         where: { id: id },
       });
 
-      console.log(`🗑️ [${eventType}] User & all their Projects wiped from DB: ${id}`);
-      return new Response('User Deleted Successfully', { status: 200 });
+      console.log(`✅ Cleanup Complete: User ${id} and their projects deleted.`);
+      return new Response('Account and Data Wiped', { status: 200 });
     } catch (err: any) {
-      console.error('❌ Delete Error:', err.message);
-      // Tetap return 200 supaya Clerk nggak ngirim ulang (retrying) webhook-nya
-      return new Response('User not found but considered deleted', { status: 200 });
+      console.error('❌ Delete Webhook Error:', err.message);
+      // Tetap kirim 200 biar Clerk gak retrying
+      return new Response('Already deleted', { status: 200 });
     }
   }
 
