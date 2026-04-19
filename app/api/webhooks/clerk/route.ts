@@ -51,7 +51,6 @@ export async function POST(req: Request) {
   const lName = cleanPart(last_name);
   const fullName = `${fName} ${lName}`.trim() || "User";
   
-  // Ambil email atau gunakan dummy jika dalam mode testing tanpa email
   const email = email_addresses?.[0]?.email_address || "no-email@test.com";
 
   // 1. CREATE & UPDATE (UPSERT)
@@ -78,14 +77,24 @@ export async function POST(req: Request) {
     }
   }
 
-  // 2. DELETE
+  // 2. DELETE (FINAL FIX)
   if (eventType === 'user.deleted') {
     try {
-      await db.user.delete({ where: { id: id } });
-      console.log(`🗑️ User Deleted: ${id}`);
-      return new Response('User Deleted', { status: 200 });
-    } catch (err) {
-      return new Response('User already gone or not found', { status: 200 });
+      // Pastikan id tersedia dari payload Clerk
+      if (!id) return new Response('Error: No user id', { status: 400 });
+
+      // Eksekusi hapus di Neon DB
+      // Ini akan otomatis menghapus Project karena onDelete: Cascade
+      await db.user.delete({
+        where: { id: id },
+      });
+
+      console.log(`🗑️ [${eventType}] User & all their Projects wiped from DB: ${id}`);
+      return new Response('User Deleted Successfully', { status: 200 });
+    } catch (err: any) {
+      console.error('❌ Delete Error:', err.message);
+      // Tetap return 200 supaya Clerk nggak ngirim ulang (retrying) webhook-nya
+      return new Response('User not found but considered deleted', { status: 200 });
     }
   }
 

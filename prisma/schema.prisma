@@ -1,10 +1,11 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
   provider = "postgresql"
-  // Baris URL dihapus di Prisma v7
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -22,6 +23,7 @@ model Project {
   id        String   @id @default(cuid())
   name      String
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  // Tambahkan onDelete: Cascade di sini
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 }
